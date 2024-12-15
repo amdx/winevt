@@ -1,9 +1,3 @@
-import logging
-
-#logging.basicConfig(level=logging.INFO)
-logging.basicConfig(level=logging.WARNING)
-logger = logging.getLogger("winevt")
-
 import winevt.settings as settings
 
 #
@@ -17,11 +11,9 @@ try:
     from ._winevt import ffi, lib as evtapi
     # Loading inline, these will be the same
     kernel32 = evtapi
-    logger.info("Loaded in-line, user compiled evtapi")
     out_of_line = True
 
 except:
-    logger.warn("Looks like you didn't successfully compile your own out-of-line pyd. Falling back to in-ine mode. This is going to be less efficient and it's recommended you compile your own. To fix this, do the following:\n    1) Check this page and install the correct compiler for your version of python: https://blogs.msdn.microsoft.com/pythonengineering/2016/04/11/unable-to-find-vcvarsall-bat/\n    2) Re-install winevt (pip install -U winevt)")
     # In-line mode
     from .winevt_build import ffibuilder
     ffi = ffibuilder()
@@ -62,3 +54,7 @@ def get_last_error():
     chars = kernel32.FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, ffi.NULL, error_id , 0, buf, 0, ffi.NULL)
 
     return ffi.string(ffi.cast("char **",buf)[0][0:chars]).decode('utf-8').strip("\r\n")
+
+
+def uses_inline():
+    return not out_of_line

@@ -1,9 +1,3 @@
-import logging
-
-logging.basicConfig(level=logging.WARNING)
-logger = logging.getLogger("setup.py")
-
-
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 # To use a consistent encoding
@@ -36,7 +30,7 @@ def _build_ffi():
         ffibuilder().compile(verbose=True)
         shutil.copyfile(glob("_winevt.*.pyd")[0],"_winevt.pyd")
     except Exception as e:
-        pass
+        print(f"Error while attempting to compile in-line extension: {e}", file=sys.stderr)
 
     # Put us back in our original directory
     os.chdir(old_dir)
@@ -97,7 +91,7 @@ setup(
     },
     cmdclass={
         'install': CustomInstallCommand,
-        #'build_py': CustomBuildPyCommand,
+        'build_py': CustomBuildPyCommand,
         'sdist': CustomSdistCommand,
     },
     package_data={'winevt': ['_winevt.pyd']},
